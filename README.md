@@ -3,23 +3,54 @@ Setup Fresh Ubuntu System
 
 Steps:
 
-1. Create setup.env
+1. Create setup.env (system specific .env file that defines partition layout settings)
 2. Run `pre_os-setup_partitions.sh`
 3. Run `pre_os-setup_installer.sh`
-
-- This setups GRUB config so installer setups /boot correctly
+  - This sets up the GRUB config so installer sets up `/boot` correctly
 
 5. Start Ubuntu GUI Installer and install OS
 6. Run `post_os-setup_chroot.sh`
-
-- Sets up chroot mounts
-- Mounts 'inside_chroot' script and related files into the CHROOT_MNT
-  directory so that the scripts can be run once we have entered the chroot
+  - Sets up chroot mounts
+  - Mounts "inside_chroot" script and related files into the `CHROOT_MNT`
+    directory so that the scripts can be run once we have entered the chroot
 
 7. Run `post_os-inside_chroot.sh`
 
-- Run steps inside the chroot environment that will finish setting up the
-  full-disk encryption (ie - create LUKS key files, setup /etc/crypttab, etc.)
+  - Run steps inside the chroot environment that will finish setting up the
+    full-disk encryption (ie - create LUKS key files, setup /etc/crypttab, etc.)
+
+
+Example: `setup.env`
+--------------------
+
+```
+PASSPHRASE_FILE=/tmp/passphrase
+
+OS_NAME="Ubuntu 20.04"
+
+SHOULD_CREATE_EFI_PARTITION=n
+SHOULD_CREATE_LVM_SWAP_PARTITION=y
+
+INSTALL_DEV=/dev/sda1
+
+EFI_PART_NUM=1
+BOOT_PART_NUM=2
+ROOTFS_PART_NUM=3
+
+EFI_DEV=${INSTALL_DEV}${EFI_PART_NUM}
+BOOT_DEV=${INSTALL_DEV}p${BOOT_PART_NUM}
+ROOTFS_DEV=${INSTALL_DEV}p${ROOTFS_PART_NUM}
+
+BOOT_PART_NAME="${OS_NAME} /boot"
+ROOTFS_PART_NAME="${OS_NAME} /"
+
+ROOT_LVM_SIZE=50G
+HOME_LVM_SIZE=50G
+DOCKER_LVM_SIZE=50G
+
+SWAP_LVM_SIZE=16G
+EMPTY_PART_SIZE=100G
+```
 
 
 `autoinstall.yml`

@@ -8,12 +8,10 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-
 #-----------------------------------------------------------------------
 # GLOBAL Placeholder Variables
 #-----------------------------------------------------------------------
 PASSPHRASE=
-
 
 #-----------------------------------------------------------------------
 # Constants
@@ -26,7 +24,6 @@ if [ ! -e "$CONSTANTS_ENV_FILE" ]; then
 fi
 
 source $CONSTANTS_ENV_FILE
-
 
 #-----------------------------------------------------------------------
 # REQUIRED Variables
@@ -65,7 +62,6 @@ OPTIONAL_VARS=(
   SWAP_LVM_SIZE
 )
 
-
 #-----------------------------------------------------------------------
 # Helper Functions
 #-----------------------------------------------------------------------
@@ -87,7 +83,6 @@ EOF
 
 }
 
-
 verify_vars_provided() {
   for v in ${REQUIRED_VARS[@]}; do
     if [ "${!v}" = "" ]; then
@@ -104,7 +99,6 @@ verify_vars_provided() {
   done
 }
 
-
 header() {
   echo
   echo "#--------------------------------------------------------"
@@ -112,11 +106,9 @@ header() {
   echo "#--------------------------------------------------------"
 }
 
-
 msg() {
   echo "[MSG] $1"
 }
-
 
 error() {
   echo "[ERROR] $1"
@@ -125,7 +117,6 @@ error() {
   usage
   exit 1
 }
-
 
 #-----------------------------------------------------------------------
 # Step:
@@ -154,7 +145,6 @@ read_luks_passphrase() {
   echo
 }
 
-
 #-----------------------------------------------------------------------
 # Step:
 #-----------------------------------------------------------------------
@@ -175,7 +165,6 @@ create_partitions() {
   create_boot_partition
   create_root_partition
 }
-
 
 create_boot_efi_partition() {
   msg "Creating /boot/efi partition"
@@ -206,7 +195,6 @@ create_root_partition() {
 
 }
 
-
 #-----------------------------------------------------------------------
 # Step:
 #-----------------------------------------------------------------------
@@ -215,7 +203,6 @@ create_luks() {
   create_boot_crypt_luks1
   create_root_crypt_luks2
 }
-
 
 create_boot_crypt_luks1() {
   msg "Creating LUKS v1 crypt on /boot partition"
@@ -227,7 +214,6 @@ create_root_crypt_luks2() {
   msg "Creating LUKS v2 crypt on / partition"
   echo -n "$PASSPHRASE" | cryptsetup luksFormat $ROOTFS_DEV
 }
-
 
 #-----------------------------------------------------------------------
 # Step:
@@ -248,7 +234,6 @@ open_root_crypt() {
   echo -n "$PASSPHRASE" | cryptsetup open $ROOTFS_DEV $ROOTFS_DEV_MAPPER
 }
 
-
 #-----------------------------------------------------------------------
 # Step:
 #-----------------------------------------------------------------------
@@ -264,14 +249,13 @@ format_partitions() {
 
 format_boot_efi_partition_fat32() {
   msg "Formatting /boot/efi as fat32"
-  mkfs.vfat -F 32  $EFI_DEV
+  mkfs.vfat -F 32 $EFI_DEV
 }
 
 format_boot_partition_ext4() {
   msg "Formatting /boot as ext4"
   mkfs.ext4 -L boot /dev/mapper/$BOOT_DEV_MAPPER
 }
-
 
 #-----------------------------------------------------------------------
 # Step:
@@ -293,7 +277,6 @@ setup_rootfs_lvm() {
   fi
 }
 
-
 #-----------------------------------------------------------------------
 # Step:
 #-----------------------------------------------------------------------
@@ -307,7 +290,6 @@ function display_grub_message() {
     echo "GRUB_ENABLE_CRYPTODISK=y" >> /target/etc/default/grub
 	END
 }
-
 
 #-----------------------------------------------------------------------
 # UNDO Operation
@@ -343,7 +325,6 @@ undo() {
   done
 }
 
-
 #-----------------------------------------------------------------------
 # MAIN()
 #-----------------------------------------------------------------------
@@ -356,7 +337,6 @@ main() {
   setup_rootfs_lvm
   display_grub_message
 }
-
 
 #-----------------------------------------------------------------------
 # MAIN()
